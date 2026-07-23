@@ -1,0 +1,10 @@
+.pio/
+node_modules/
+.expo/
+android/
+ios/
+.env
+firebase-key.json
+.DS_Store
+.vscode/c_cpp_properties.json
+.vscode/launch.json
