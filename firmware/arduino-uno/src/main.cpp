@@ -1,12 +1,17 @@
-// Phase 1 scaffold — sensor logic will be added in Phase 2
-
 #include <Arduino.h>
 #include "config.h"
 #include "sensors.h"
 #include "display.h"
 #include "serial_comm.h"
 
-unsigned long lastLoopPrint = 0;
+unsigned long lastSensorRead = 0;
+
+float g_ph = 0.0;
+float g_do = 0.0;
+float g_turb = 0.0;
+float g_temp = 0.0;
+float g_battV = 0.0;
+float g_battA = 0.0;
 
 void setup() {
     Serial.begin(9600);
@@ -29,8 +34,27 @@ void setup() {
 
 void loop() {
     unsigned long now = millis();
-    if (now - lastLoopPrint >= 2000) {
-        lastLoopPrint = now;
-        Serial.println("loop running");
+    if (now - lastSensorRead >= SENSOR_INTERVAL) {
+        lastSensorRead = now;
+
+        g_ph = read_ph();
+        g_do = read_do();
+        g_turb = read_turbidity();
+        g_temp = read_temperature();
+        g_battV = read_battery_voltage();
+        g_battA = read_battery_current();
+
+        Serial.print("pH=");
+        Serial.print(g_ph, 2);
+        Serial.print(" DO=");
+        Serial.print(g_do, 2);
+        Serial.print(" Turb=");
+        Serial.print(g_turb, 1);
+        Serial.print(" Temp=");
+        Serial.print(g_temp, 1);
+        Serial.print(" BatV=");
+        Serial.print(g_battV, 1);
+        Serial.print(" BatA=");
+        Serial.println(g_battA, 2);
     }
 }
