@@ -1,0 +1,20 @@
+{
+  "name": "mobile",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "expo": "~54.0.0",
+    "expo-status-bar": "^57.0.1",
+    "firebase": "^12.17.0",
+    "react": "^19.1.0",
+    "react-native": "^0.81.5"
+  }
+}
