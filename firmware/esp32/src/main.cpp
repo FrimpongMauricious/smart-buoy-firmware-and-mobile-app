@@ -5,6 +5,7 @@
 #include "wifi_manager.h"
 #include "firebase_client.h"
 #include "serial_parser.h"
+#include "alert_checker.h"
 
 unsigned long lastWifiRetry = 0;
 const unsigned long WIFI_RETRY_INTERVAL_MS = 30000;
@@ -34,6 +35,20 @@ void loop() {
         if (json.length() > 0 && wifi_is_connected()) {
             bool ok = firebase_send_reading(json.c_str());
             Serial.println(ok ? "Reading sent to Firebase" : "Failed to send reading to Firebase");
+
+            // Check the same reading against safe thresholds and raise an alert if needed.
+            JsonDocument reading;
+            DeserializationError err = deserializeJson(reading, json);
+            if (!err) {
+                String alertMsg = check_thresholds(reading);
+                if (alertMsg.length() > 0 && wifi_is_connected()) {
+                    firebase_send_alert(BUOY_ID, alertMsg);
+                    Serial.print("ALERT: ");
+                    Serial.println(alertMsg);
+                } else if (alertMsg.length() == 0) {
+                    Serial.println("All readings normal");
+                }
+            }
         }
     }
 

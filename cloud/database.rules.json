@@ -1,0 +1,27 @@
+{
+  "rules": {
+    "buoys": {
+      "$buoyId": {
+        "readings": {
+          ".read": true,
+          ".write": "auth != null || !data.exists()",
+          ".indexOn": ["ts"]
+        },
+        "status": {
+          ".read": true,
+          ".write": true
+        },
+        "thresholds": {
+          ".read": true,
+          ".write": true
+        },
+        "info": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    },
+    ".read": false,
+    ".write": false
+  }
+}

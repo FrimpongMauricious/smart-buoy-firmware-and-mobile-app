@@ -53,3 +53,28 @@ inline bool firebase_send_reading(const char* json) {
 
     return success;
 }
+
+// Pushes a single alert message onto /buoys/{buoy_id}/alerts so the mobile app can show history.
+inline bool firebase_send_alert(const char* buoy_id, const String& alert_message) {
+    String url = "https://" + String(FIREBASE_HOST) + "/buoys/" + String(buoy_id) + "/alerts.json?auth=" + String(FIREBASE_AUTH);
+
+    StaticJsonDocument<256> doc;
+    doc["message"] = alert_message;
+    doc["severity"] = "warning";
+    doc["ts"] = millis(); // real timestamp will come once NTP sync is added later
+
+    String payload;
+    serializeJson(doc, payload);
+
+    HTTPClient http;
+    WiFiClientSecure client;
+    client.setInsecure();
+    http.begin(client, url);
+    http.addHeader("Content-Type", "application/json");
+    int code = http.POST(payload);
+    http.end();
+
+    Serial.print("Alert POST response code: ");
+    Serial.println(code);
+    return (code == 200 || code == 204);
+}
