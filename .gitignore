@@ -8,3 +8,4 @@ firebase-key.json
 .DS_Store
 .vscode/c_cpp_properties.json
 .vscode/launch.json
+firmware/esp32/include/config.h

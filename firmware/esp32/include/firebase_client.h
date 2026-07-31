@@ -1,13 +1,55 @@
-#ifndef FIREBASE_CLIENT_H
-#define FIREBASE_CLIENT_H
+#pragma once
+
+#include <HTTPClient.h>
+#include <WiFiClientSecure.h>
+#include <ArduinoJson.h>
+#include "config.h"
 
 inline void firebase_init() {
-    // TODO: implement
+    // No handshake/session needed for the REST API — each send is a standalone HTTPS request.
+    Serial.println("Firebase client ready (REST API mode)");
 }
 
+// Validates the incoming line as JSON, then pushes it to Firebase Realtime Database
+// via the REST API: POST appends a new timestamped reading, PUT overwrites the
+// buoy's "last seen" status.
 inline bool firebase_send_reading(const char* json) {
-    // TODO: implement
-    return false;
-}
+    StaticJsonDocument<256> doc;
+    DeserializationError err = deserializeJson(doc, json);
+    if (err) {
+        Serial.print("firebase_send_reading: invalid JSON, skipping (");
+        Serial.print(err.c_str());
+        Serial.println(")");
+        return false;
+    }
 
-#endif // FIREBASE_CLIENT_H
+    WiFiClientSecure client;
+    client.setInsecure(); // skip certificate validation - simplest option for a student project
+
+    HTTPClient http;
+    bool success = false;
+
+    // POST the reading so Firebase auto-generates a new timestamped child key.
+    String url = "https://" + String(FIREBASE_HOST) + "/buoys/" + String(BUOY_ID) + "/readings.json?auth=" + String(FIREBASE_AUTH);
+    if (http.begin(client, url)) {
+        http.addHeader("Content-Type", "application/json");
+        int code = http.POST(json);
+        Serial.print("Firebase readings POST response code: ");
+        Serial.println(code);
+        success = (code == 200 || code == 204);
+        http.end();
+    }
+
+    // PUT a small status blob so the dashboard can show the buoy is online.
+    String statusUrl = "https://" + String(FIREBASE_HOST) + "/buoys/" + String(BUOY_ID) + "/status.json?auth=" + String(FIREBASE_AUTH);
+    String statusJson = "{\"last_seen\":" + String(millis()) + ",\"online\":true}";
+    if (http.begin(client, statusUrl)) {
+        http.addHeader("Content-Type", "application/json");
+        int statusCode = http.PUT(statusJson);
+        Serial.print("Firebase status PUT response code: ");
+        Serial.println(statusCode);
+        http.end();
+    }
+
+    return success;
+}
