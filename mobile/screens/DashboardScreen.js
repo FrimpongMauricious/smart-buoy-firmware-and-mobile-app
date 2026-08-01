@@ -61,7 +61,9 @@ const POSITION_LABELS = ["Now", "-30m", "-1h", "-2h"];
 function BellIcon({ hasAlerts }) {
   return (
     <View style={styles.bellIconWrap}>
-      <Image source={require("../assets/images/bell_alert.png")} style={styles.headerBellImage} />
+      <View style={styles.headerBellShadow}>
+        <Image source={require("../assets/images/bell_alert.png")} style={styles.headerBellImage} />
+      </View>
       {hasAlerts && <View style={styles.bellIconBadge} />}
     </View>
   );
@@ -172,7 +174,9 @@ export default function DashboardScreen({ onOpenAlerts, hasAlerts }) {
       <View style={styles.heroWrap}>
         <View style={styles.glowOuter} />
         <View style={styles.glowInner} />
-        <Image source={require("../assets/images/hero_droplet.png")} style={styles.heroImage} />
+        <View style={styles.heroImageShadow}>
+          <Image source={require("../assets/images/hero_droplet.png")} style={styles.heroImage} />
+        </View>
       </View>
 
       <Text style={styles.heroTemp}>{temp != null ? `${Math.round(temp)}°C` : "--°C"}</Text>
@@ -180,15 +184,21 @@ export default function DashboardScreen({ onOpenAlerts, hasAlerts }) {
 
       <View style={styles.iconStrip}>
         <View style={styles.iconStripItem}>
-          <Image source={require("../assets/images/ph_beaker.png")} style={styles.stripIcon} />
+          <View style={styles.stripIconShadow}>
+            <Image source={require("../assets/images/ph_beaker.png")} style={styles.stripIcon} />
+          </View>
           <Text style={styles.iconStripLabel}>pH  {ph != null ? ph.toFixed(2) : "--"}</Text>
         </View>
         <View style={styles.iconStripItem}>
-          <Image source={require("../assets/images/oxygen_bubbles.png")} style={styles.stripIcon} />
+          <View style={styles.stripIconShadow}>
+            <Image source={require("../assets/images/oxygen_bubbles.png")} style={styles.stripIcon} />
+          </View>
           <Text style={styles.iconStripLabel}>O₂  {dox != null ? `${dox.toFixed(2)} mg/L` : "--"}</Text>
         </View>
         <View style={styles.iconStripItem}>
-          <Image source={require("../assets/images/turbidity_droplet.png")} style={styles.stripIcon} />
+          <View style={styles.stripIconShadow}>
+            <Image source={require("../assets/images/turbidity_droplet.png")} style={styles.stripIcon} />
+          </View>
           <Text style={styles.iconStripLabel}>Turb  {turbidity != null ? turbidity.toFixed(1) : "--"}</Text>
         </View>
       </View>
@@ -262,23 +272,31 @@ const styles = StyleSheet.create({
   },
   glowOuter: {
     position: "absolute",
-    width: 320,
-    height: 320,
+    width: 350,
+    height: 350,
     borderRadius: 999,
     backgroundColor: COLORS.glow,
     opacity: 0.15,
   },
   glowInner: {
     position: "absolute",
-    width: 220,
-    height: 220,
+    width: 250,
+    height: 250,
     borderRadius: 999,
     backgroundColor: COLORS.glow,
     opacity: 0.28,
   },
+  heroImageShadow: {
+    backgroundColor: "transparent",
+    shadowColor: "#06b6d4",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 12,
+  },
   heroImage: {
-    width: 200,
-    height: 200,
+    width: 260,
+    height: 260,
     resizeMode: "contain",
   },
   heroTemp: {
@@ -314,9 +332,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  headerBellShadow: {
+    backgroundColor: "transparent",
+    shadowColor: "#06b6d4",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+  },
   headerBellImage: {
-    width: 26,
-    height: 26,
+    width: 34,
+    height: 34,
     resizeMode: "contain",
   },
   bellIconBadge: {
@@ -330,9 +356,18 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: COLORS.background,
   },
+  stripIconShadow: {
+    marginBottom: 6,
+    backgroundColor: "transparent",
+    shadowColor: "#06b6d4",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 6,
+  },
   stripIcon: {
-    width: 36,
-    height: 36,
+    width: 56,
+    height: 56,
     resizeMode: "contain",
   },
   clockCircle: {

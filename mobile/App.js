@@ -38,7 +38,9 @@ function HistoryIcon({ color }) {
 function BellIcon({ hasAlerts }) {
   return (
     <View style={styles.iconGroup}>
-      <Image source={require("./assets/images/bell_alert.png")} style={styles.navBellImage} />
+      <View style={styles.navIconShadow}>
+        <Image source={require("./assets/images/bell_alert.png")} style={styles.navBellImage} />
+      </View>
       {hasAlerts && <View style={styles.bellBadge} />}
     </View>
   );
@@ -47,7 +49,9 @@ function BellIcon({ hasAlerts }) {
 function GearIcon() {
   return (
     <View style={styles.iconGroup}>
-      <Image source={require("./assets/images/gear_settings.png")} style={styles.navGearImage} />
+      <View style={styles.navIconShadow}>
+        <Image source={require("./assets/images/gear_settings.png")} style={styles.navGearImage} />
+      </View>
     </View>
   );
 }
@@ -177,14 +181,22 @@ const styles = StyleSheet.create({
     top: 10,
     left: 11,
   },
+  navIconShadow: {
+    backgroundColor: "transparent",
+    shadowColor: "#06b6d4",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+  },
   navBellImage: {
-    width: 24,
-    height: 24,
+    width: 30,
+    height: 30,
     resizeMode: "contain",
   },
   navGearImage: {
-    width: 24,
-    height: 24,
+    width: 30,
+    height: 30,
     resizeMode: "contain",
   },
   bellBadge: {

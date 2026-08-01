@@ -78,7 +78,9 @@ export default function AlertsScreen({ onBack }) {
       >
         {alerts.length === 0 ? (
           <>
-            <Image source={require("../assets/images/fish_healthy.png")} style={styles.emptyImage} />
+            <View style={styles.emptyImageShadow}>
+              <Image source={require("../assets/images/fish_healthy.png")} style={styles.emptyImage} />
+            </View>
             <Text style={styles.emptyTitle}>All clear</Text>
             <Text style={styles.emptySubtitle}>No alerts in the last 24 hours</Text>
           </>
@@ -182,11 +184,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingBottom: 80,
   },
-  emptyImage: {
-    width: 140,
-    height: 140,
-    resizeMode: "contain",
+  emptyImageShadow: {
     alignSelf: "center",
+    backgroundColor: "transparent",
+    shadowColor: "#06b6d4",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 10,
+  },
+  emptyImage: {
+    width: 180,
+    height: 180,
+    resizeMode: "contain",
   },
   emptyTitle: {
     color: COLORS.text,
