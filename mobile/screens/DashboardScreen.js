@@ -291,6 +291,7 @@ const styles = StyleSheet.create({
   },
   heroWrap: {
     height: 250,
+    marginTop: -8,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -337,6 +338,7 @@ const styles = StyleSheet.create({
     fontSize: 90,
     fontWeight: "800",
     textAlign: "center",
+    marginTop: -10,
   },
   healthMessage: {
     color: COLORS.subtext,
@@ -348,7 +350,7 @@ const styles = StyleSheet.create({
   iconStrip: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginTop: 32,
+    marginTop: 22,
     paddingHorizontal: 16,
   },
   iconStripItem: {
@@ -483,8 +485,8 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 36,
-    marginBottom: 14,
+    marginTop: 48,
+    marginBottom: 8,
     paddingHorizontal: 20,
   },
   sectionTitle: {

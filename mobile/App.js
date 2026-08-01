@@ -118,6 +118,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.background,
+    paddingTop: 10,
   },
   body: {
     flex: 1,
