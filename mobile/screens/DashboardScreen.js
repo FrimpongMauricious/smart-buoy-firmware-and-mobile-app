@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, FlatList, TouchableOpacity, RefreshControl } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, FlatList, TouchableOpacity, RefreshControl } from "react-native";
 import { ref, query, limitToLast, onValue } from "firebase/database";
 import { database } from "../firebaseConfig";
 
@@ -11,9 +11,6 @@ const COLORS = {
   background: "#0a0f1a",
   card: "#12192a",
   glow: "#0891b2",
-  cyan: "#06b6d4",
-  cyanDeep: "#0e7490",
-  cyanBright: "#22d3ee",
   green: "#10b981",
   yellow: "#f59e0b",
   red: "#ef4444",
@@ -64,36 +61,8 @@ const POSITION_LABELS = ["Now", "-30m", "-1h", "-2h"];
 function BellIcon({ hasAlerts }) {
   return (
     <View style={styles.bellIconWrap}>
-      <View style={styles.bellIconBody} />
-      <View style={styles.bellIconLip} />
+      <Image source={require("../assets/images/bell_alert.png")} style={styles.headerBellImage} />
       {hasAlerts && <View style={styles.bellIconBadge} />}
-    </View>
-  );
-}
-
-function BeakerIcon() {
-  return (
-    <View style={styles.beakerWrap}>
-      <View style={styles.beakerNeck} />
-      <View style={styles.beakerBody} />
-    </View>
-  );
-}
-
-function BubbleIcon() {
-  return (
-    <View style={styles.bubbleOuter}>
-      <View style={styles.bubbleInner} />
-    </View>
-  );
-}
-
-function WaveIcon() {
-  return (
-    <View style={styles.waveWrap}>
-      <View style={[styles.waveDot, styles.waveDotUp]} />
-      <View style={[styles.waveDot, styles.waveDotDown]} />
-      <View style={[styles.waveDot, styles.waveDotUp]} />
     </View>
   );
 }
@@ -203,10 +172,7 @@ export default function DashboardScreen({ onOpenAlerts, hasAlerts }) {
       <View style={styles.heroWrap}>
         <View style={styles.glowOuter} />
         <View style={styles.glowInner} />
-        <View style={styles.heroCircle}>
-          <View style={styles.heroSheen} />
-          <Text style={styles.heroEmoji}>💧</Text>
-        </View>
+        <Image source={require("../assets/images/hero_droplet.png")} style={styles.heroImage} />
       </View>
 
       <Text style={styles.heroTemp}>{temp != null ? `${Math.round(temp)}°C` : "--°C"}</Text>
@@ -214,15 +180,15 @@ export default function DashboardScreen({ onOpenAlerts, hasAlerts }) {
 
       <View style={styles.iconStrip}>
         <View style={styles.iconStripItem}>
-          <BeakerIcon />
+          <Image source={require("../assets/images/ph_beaker.png")} style={styles.stripIcon} />
           <Text style={styles.iconStripLabel}>pH  {ph != null ? ph.toFixed(2) : "--"}</Text>
         </View>
         <View style={styles.iconStripItem}>
-          <BubbleIcon />
+          <Image source={require("../assets/images/oxygen_bubbles.png")} style={styles.stripIcon} />
           <Text style={styles.iconStripLabel}>O₂  {dox != null ? `${dox.toFixed(2)} mg/L` : "--"}</Text>
         </View>
         <View style={styles.iconStripItem}>
-          <WaveIcon />
+          <Image source={require("../assets/images/turbidity_droplet.png")} style={styles.stripIcon} />
           <Text style={styles.iconStripLabel}>Turb  {turbidity != null ? turbidity.toFixed(1) : "--"}</Text>
         </View>
       </View>
@@ -310,27 +276,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.glow,
     opacity: 0.28,
   },
-  heroCircle: {
+  heroImage: {
     width: 200,
     height: 200,
-    borderRadius: 100,
-    backgroundColor: COLORS.cyanDeep,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  heroSheen: {
-    position: "absolute",
-    top: -30,
-    left: -30,
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: COLORS.cyanBright,
-    opacity: 0.45,
-  },
-  heroEmoji: {
-    fontSize: 120,
+    resizeMode: "contain",
   },
   heroTemp: {
     color: COLORS.text,
@@ -365,21 +314,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  bellIconBody: {
-    width: 15,
-    height: 13,
-    borderWidth: 2,
-    borderColor: COLORS.text,
-    borderBottomWidth: 0,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  bellIconLip: {
-    width: 19,
-    height: 2,
-    borderRadius: 1,
-    backgroundColor: COLORS.text,
-    marginTop: 1,
+  headerBellImage: {
+    width: 26,
+    height: 26,
+    resizeMode: "contain",
   },
   bellIconBadge: {
     position: "absolute",
@@ -392,58 +330,10 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: COLORS.background,
   },
-  beakerWrap: {
-    alignItems: "center",
-  },
-  beakerNeck: {
-    width: 8,
-    height: 5,
-    borderWidth: 1.5,
-    borderColor: COLORS.cyan,
-    borderBottomWidth: 0,
-  },
-  beakerBody: {
-    width: 24,
-    height: 18,
-    borderWidth: 1.5,
-    borderColor: COLORS.cyan,
-    borderTopWidth: 0,
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
-    backgroundColor: "rgba(6,182,212,0.2)",
-  },
-  bubbleOuter: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: COLORS.cyan,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  bubbleInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: COLORS.cyan,
-  },
-  waveWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: 28,
-  },
-  waveDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: COLORS.cyan,
-    marginHorizontal: 3,
-  },
-  waveDotUp: {
-    marginBottom: 8,
-  },
-  waveDotDown: {
-    marginTop: 8,
+  stripIcon: {
+    width: 36,
+    height: 36,
+    resizeMode: "contain",
   },
   clockCircle: {
     width: 20,

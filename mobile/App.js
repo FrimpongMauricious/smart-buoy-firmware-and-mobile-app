@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
 import { ref, query, limitToLast, onValue } from "firebase/database";
 import { database } from "./firebaseConfig";
 import DashboardScreen from "./screens/DashboardScreen";
@@ -35,30 +35,19 @@ function HistoryIcon({ color }) {
   );
 }
 
-function BellIcon({ color, hasAlerts }) {
+function BellIcon({ hasAlerts }) {
   return (
     <View style={styles.iconGroup}>
-      <View style={[styles.bellBody, { borderColor: color }]} />
-      <View style={[styles.bellLip, { backgroundColor: color }]} />
+      <Image source={require("./assets/images/bell_alert.png")} style={styles.navBellImage} />
       {hasAlerts && <View style={styles.bellBadge} />}
     </View>
   );
 }
 
-function GearIcon({ color }) {
-  const teeth = [0, 45, 90, 135, 180, 225, 270, 315];
+function GearIcon() {
   return (
-    <View style={styles.gearWrap}>
-      {teeth.map((angle) => (
-        <View
-          key={angle}
-          style={[
-            styles.gearTooth,
-            { backgroundColor: color, transform: [{ rotate: `${angle}deg` }, { translateY: -9 }] },
-          ]}
-        />
-      ))}
-      <View style={[styles.gearRing, { borderColor: color }]} />
+    <View style={styles.iconGroup}>
+      <Image source={require("./assets/images/gear_settings.png")} style={styles.navGearImage} />
     </View>
   );
 }
@@ -81,8 +70,8 @@ export default function App() {
   const tabs = [
     { key: "dashboard", render: (color) => <HomeIcon color={color} /> },
     { key: "history", render: (color) => <HistoryIcon color={color} /> },
-    { key: "alerts", render: (color) => <BellIcon color={color} hasAlerts={hasAlerts} /> },
-    { key: "settings", render: (color) => <GearIcon color={color} /> },
+    { key: "alerts", render: () => <BellIcon hasAlerts={hasAlerts} /> },
+    { key: "settings", render: () => <GearIcon /> },
   ];
 
   return (
@@ -188,19 +177,15 @@ const styles = StyleSheet.create({
     top: 10,
     left: 11,
   },
-  bellBody: {
-    width: 15,
-    height: 13,
-    borderWidth: 2,
-    borderBottomWidth: 0,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+  navBellImage: {
+    width: 24,
+    height: 24,
+    resizeMode: "contain",
   },
-  bellLip: {
-    width: 19,
-    height: 2,
-    borderRadius: 1,
-    marginTop: 1,
+  navGearImage: {
+    width: 24,
+    height: 24,
+    resizeMode: "contain",
   },
   bellBadge: {
     position: "absolute",
@@ -212,25 +197,5 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.red,
     borderWidth: 1.5,
     borderColor: COLORS.navBackground,
-  },
-  gearWrap: {
-    width: 22,
-    height: 22,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  gearTooth: {
-    position: "absolute",
-    width: 3,
-    height: 5,
-    borderRadius: 1,
-  },
-  gearRing: {
-    position: "absolute",
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    borderWidth: 2,
-    backgroundColor: COLORS.navBackground,
   },
 });

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from "react-native";
 import { ref, query, limitToLast, onValue } from "firebase/database";
 import { database } from "../firebaseConfig";
 
@@ -95,6 +95,7 @@ export default function SettingsScreen({ onBack }) {
         }
       >
         <View style={styles.section}>
+          <Image source={require("../assets/images/thermometer.png")} style={styles.thermometerImage} />
           <Text style={styles.sectionTitle}>Buoy Info</Text>
           <Row label="Buoy ID" value={BUOY_ID} />
           <Row label="Location" value={BUOY_LOCATION} />
@@ -163,6 +164,14 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     padding: 18,
     marginBottom: 18,
+  },
+  thermometerImage: {
+    position: "absolute",
+    top: 18,
+    right: 18,
+    width: 32,
+    height: 32,
+    resizeMode: "contain",
   },
   sectionTitle: {
     color: COLORS.subtext,

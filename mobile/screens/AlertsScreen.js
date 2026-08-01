@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from "react-native";
 import { ref, query, orderByChild, limitToLast, onValue } from "firebase/database";
 import { database } from "../firebaseConfig";
 
@@ -10,7 +10,6 @@ const COLORS = {
   card: "#12192a",
   yellow: "#f59e0b",
   red: "#ef4444",
-  green: "#10b981",
   text: "#ffffff",
   subtext: "#94a3b8",
 };
@@ -79,10 +78,7 @@ export default function AlertsScreen({ onBack }) {
       >
         {alerts.length === 0 ? (
           <>
-            <View style={styles.emptyGlow} />
-            <View style={styles.emptyCircle}>
-              <Text style={styles.emptyCheck}>✓</Text>
-            </View>
+            <Image source={require("../assets/images/fish_healthy.png")} style={styles.emptyImage} />
             <Text style={styles.emptyTitle}>All clear</Text>
             <Text style={styles.emptySubtitle}>No alerts in the last 24 hours</Text>
           </>
@@ -186,26 +182,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingBottom: 80,
   },
-  emptyGlow: {
-    position: "absolute",
-    width: 180,
-    height: 180,
-    borderRadius: 999,
-    backgroundColor: COLORS.green,
-    opacity: 0.15,
-  },
-  emptyCircle: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: COLORS.green,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  emptyCheck: {
-    fontSize: 46,
-    color: "#ffffff",
-    fontWeight: "700",
+  emptyImage: {
+    width: 140,
+    height: 140,
+    resizeMode: "contain",
+    alignSelf: "center",
   },
   emptyTitle: {
     color: COLORS.text,
