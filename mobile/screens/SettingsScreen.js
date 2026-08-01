@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from "react-native";
 import { ref, query, limitToLast, onValue } from "firebase/database";
 import { database } from "../firebaseConfig";
 
@@ -43,6 +43,7 @@ function Row({ label, value, last }) {
 export default function SettingsScreen({ onBack }) {
   const [status, setStatus] = useState(null);
   const [reading, setReading] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const statusRef = ref(database, `buoys/${BUOY_ID}/status`);
@@ -66,6 +67,11 @@ export default function SettingsScreen({ onBack }) {
 
   const batteryV = reading?.battery_v;
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 800);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
@@ -76,7 +82,18 @@ export default function SettingsScreen({ onBack }) {
         <View style={styles.iconButton} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#06b6d4"
+            colors={["#06b6d4"]}
+          />
+        }
+      >
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Buoy Info</Text>
           <Row label="Buoy ID" value={BUOY_ID} />

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, FlatList } from "react-native";
+import { View, Text, StyleSheet, ScrollView, FlatList, TouchableOpacity, RefreshControl } from "react-native";
 import { ref, query, limitToLast, onValue } from "firebase/database";
 import { database } from "../firebaseConfig";
 
@@ -61,18 +61,12 @@ function severityRank(color) {
 // sync is added to the firmware we just label cards by their position in the list.
 const POSITION_LABELS = ["Now", "-30m", "-1h", "-2h"];
 
-function CalendarIcon() {
+function BellIcon({ hasAlerts }) {
   return (
-    <View style={styles.calendarBox}>
-      <View style={styles.calendarTopBar} />
-      <View style={styles.calendarGridRow}>
-        <View style={styles.calendarDot} />
-        <View style={styles.calendarDot} />
-      </View>
-      <View style={styles.calendarGridRow}>
-        <View style={styles.calendarDot} />
-        <View style={styles.calendarDot} />
-      </View>
+    <View style={styles.bellIconWrap}>
+      <View style={styles.bellIconBody} />
+      <View style={styles.bellIconLip} />
+      {hasAlerts && <View style={styles.bellIconBadge} />}
     </View>
   );
 }
@@ -113,10 +107,16 @@ function ClockIcon() {
   );
 }
 
-export default function DashboardScreen() {
+export default function DashboardScreen({ onOpenAlerts, hasAlerts }) {
   const [readings, setReadings] = useState([]);
   const [status, setStatus] = useState(null);
   const [now, setNow] = useState(Date.now());
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 800);
+  };
 
   useEffect(() => {
     const readingsRef = query(ref(database, `buoys/${BUOY_ID}/readings`), limitToLast(4));
@@ -176,11 +176,23 @@ export default function DashboardScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor="#06b6d4"
+          colors={["#06b6d4"]}
+        />
+      }
+    >
       <View style={styles.topBar}>
-        <View style={styles.iconButton}>
-          <CalendarIcon />
-        </View>
+        <TouchableOpacity style={styles.iconButton} onPress={onOpenAlerts}>
+          <BellIcon hasAlerts={hasAlerts} />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.titleBlock}>
@@ -349,34 +361,36 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontWeight: "600",
   },
-  calendarBox: {
-    width: 24,
-    height: 24,
-    borderWidth: 1.5,
-    borderColor: COLORS.subtext,
-    borderRadius: 6,
-    overflow: "hidden",
+  bellIconWrap: {
     alignItems: "center",
     justifyContent: "center",
   },
-  calendarTopBar: {
+  bellIconBody: {
+    width: 15,
+    height: 13,
+    borderWidth: 2,
+    borderColor: COLORS.text,
+    borderBottomWidth: 0,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  bellIconLip: {
+    width: 19,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: COLORS.text,
+    marginTop: 1,
+  },
+  bellIconBadge: {
     position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 6,
-    backgroundColor: COLORS.subtext,
-  },
-  calendarGridRow: {
-    flexDirection: "row",
-    marginVertical: 1.5,
-  },
-  calendarDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: COLORS.subtext,
-    marginHorizontal: 2,
+    top: -2,
+    right: -2,
+    width: 9,
+    height: 9,
+    borderRadius: 4.5,
+    backgroundColor: COLORS.red,
+    borderWidth: 1.5,
+    borderColor: COLORS.background,
   },
   beakerWrap: {
     alignItems: "center",

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from "react-native";
 import { ref, query, orderByChild, limitToLast, onValue } from "firebase/database";
 import { database } from "../firebaseConfig";
 
@@ -29,6 +29,12 @@ function BackArrowIcon() {
 
 export default function AlertsScreen({ onBack }) {
   const [alerts, setAlerts] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 800);
+  };
 
   useEffect(() => {
     const alertsRef = query(
@@ -59,18 +65,29 @@ export default function AlertsScreen({ onBack }) {
         <View style={styles.iconButton} />
       </View>
 
-      {alerts.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <View style={styles.emptyGlow} />
-          <View style={styles.emptyCircle}>
-            <Text style={styles.emptyCheck}>✓</Text>
-          </View>
-          <Text style={styles.emptyTitle}>All clear</Text>
-          <Text style={styles.emptySubtitle}>No alerts in the last 24 hours</Text>
-        </View>
-      ) : (
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-          {alerts.map((alert) => {
+      <ScrollView
+        contentContainerStyle={alerts.length === 0 ? styles.emptyContainer : styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#06b6d4"
+            colors={["#06b6d4"]}
+          />
+        }
+      >
+        {alerts.length === 0 ? (
+          <>
+            <View style={styles.emptyGlow} />
+            <View style={styles.emptyCircle}>
+              <Text style={styles.emptyCheck}>✓</Text>
+            </View>
+            <Text style={styles.emptyTitle}>All clear</Text>
+            <Text style={styles.emptySubtitle}>No alerts in the last 24 hours</Text>
+          </>
+        ) : (
+          alerts.map((alert) => {
             const isDanger = alert.severity === "danger";
             const badgeColor = isDanger ? COLORS.red : COLORS.yellow;
             return (
@@ -84,9 +101,9 @@ export default function AlertsScreen({ onBack }) {
                 <Text style={styles.timestamp}>{formatTimestamp(alert.ts)}</Text>
               </View>
             );
-          })}
-        </ScrollView>
-      )}
+          })
+        )}
+      </ScrollView>
     </View>
   );
 }
@@ -163,7 +180,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   emptyContainer: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 32,

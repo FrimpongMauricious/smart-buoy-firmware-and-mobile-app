@@ -88,7 +88,9 @@ export default function App() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.body}>
-        {(currentScreen === "dashboard" || currentScreen === "history") && <DashboardScreen />}
+        {(currentScreen === "dashboard" || currentScreen === "history") && (
+          <DashboardScreen onOpenAlerts={() => setCurrentScreen("alerts")} hasAlerts={hasAlerts} />
+        )}
         {currentScreen === "alerts" && <AlertsScreen onBack={goToDashboard} />}
         {currentScreen === "settings" && <SettingsScreen onBack={goToDashboard} />}
       </View>
