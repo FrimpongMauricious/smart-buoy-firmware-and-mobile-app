@@ -4,7 +4,12 @@
       "$buoyId": {
         "readings": {
           ".read": true,
-          ".write": "auth != null || !data.exists()",
+          ".write": true,
+          ".indexOn": ["ts"]
+        },
+        "alerts": {
+          ".read": true,
+          ".write": true,
           ".indexOn": ["ts"]
         },
         "status": {
