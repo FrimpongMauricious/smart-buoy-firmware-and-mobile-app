@@ -61,16 +61,6 @@ function severityRank(color) {
 // sync is added to the firmware we just label cards by their position in the list.
 const POSITION_LABELS = ["Now", "-30m", "-1h", "-2h"];
 
-function HamburgerIcon() {
-  return (
-    <View style={styles.hamburgerWrap}>
-      <View style={styles.hamburgerLine} />
-      <View style={styles.hamburgerLine} />
-      <View style={styles.hamburgerLine} />
-    </View>
-  );
-}
-
 function CalendarIcon() {
   return (
     <View style={styles.calendarBox}>
@@ -189,9 +179,6 @@ export default function DashboardScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       <View style={styles.topBar}>
         <View style={styles.iconButton}>
-          <HamburgerIcon />
-        </View>
-        <View style={styles.iconButton}>
           <CalendarIcon />
         </View>
       </View>
@@ -263,7 +250,7 @@ const styles = StyleSheet.create({
   },
   topBar: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 8,
@@ -361,17 +348,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 8,
     fontWeight: "600",
-  },
-  hamburgerWrap: {
-    width: 20,
-    height: 14,
-    justifyContent: "space-between",
-  },
-  hamburgerLine: {
-    height: 2,
-    width: 20,
-    borderRadius: 1,
-    backgroundColor: COLORS.text,
   },
   calendarBox: {
     width: 24,
