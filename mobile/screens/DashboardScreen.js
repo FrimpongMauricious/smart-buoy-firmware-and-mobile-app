@@ -55,13 +55,11 @@ function severityRank(color) {
   return 0;
 }
 
-function timeLabel(ts, now) {
-  if (ts == null) return "--";
-  const diffMin = Math.round((now - ts) / 60000);
-  if (diffMin <= 0) return "Now";
-  if (diffMin < 60) return `-${diffMin}m`;
-  return `-${Math.round(diffMin / 60)}h`;
-}
+// Temporary position-based labels: the ESP32 doesn't have NTP sync yet, so each
+// reading's `ts` is millis() (device uptime), not real epoch time. Real elapsed-time
+// math against Date.now() would show meaningless/misleading durations, so until NTP
+// sync is added to the firmware we just label cards by their position in the list.
+const POSITION_LABELS = ["Now", "-30m", "-1h", "-2h"];
 
 function HamburgerIcon() {
   return (
@@ -76,14 +74,12 @@ function HamburgerIcon() {
 function CalendarIcon() {
   return (
     <View style={styles.calendarBox}>
-      <View style={styles.calendarLine} />
-      <View style={styles.calendarDotsRow}>
-        <View style={styles.calendarDot} />
+      <View style={styles.calendarTopBar} />
+      <View style={styles.calendarGridRow}>
         <View style={styles.calendarDot} />
         <View style={styles.calendarDot} />
       </View>
-      <View style={styles.calendarDotsRow}>
-        <View style={styles.calendarDot} />
+      <View style={styles.calendarGridRow}>
         <View style={styles.calendarDot} />
         <View style={styles.calendarDot} />
       </View>
@@ -159,6 +155,11 @@ export default function DashboardScreen() {
 
   const latest = readings.length > 0 ? readings[readings.length - 1] : null;
   const recentDisplay = [...readings].reverse();
+  const cardSlots = POSITION_LABELS.map((label, index) => ({
+    key: recentDisplay[index]?.id ?? `placeholder-${index}`,
+    item: recentDisplay[index] ?? null,
+    label,
+  }));
 
   const ph = latest?.ph;
   const dox = latest?.["do"];
@@ -234,16 +235,16 @@ export default function DashboardScreen() {
 
       <FlatList
         horizontal
-        data={recentDisplay}
-        keyExtractor={(item) => item.id}
+        data={cardSlots}
+        keyExtractor={(slot) => slot.key}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.recentListContent}
-        renderItem={({ item }) => (
-          <View style={styles.recentCard}>
+        renderItem={({ item: slot }) => (
+          <View style={[styles.recentCard, !slot.item && styles.recentCardEmpty]}>
             <View style={styles.recentCardIcon} />
-            <Text style={styles.recentCardTime}>{timeLabel(item.ts, now)}</Text>
+            <Text style={styles.recentCardTime}>{slot.label}</Text>
             <Text style={styles.recentCardTemp}>
-              {item.temp != null ? `${Math.round(item.temp)}°` : "--"}
+              {slot.item?.temp != null ? `${Math.round(slot.item.temp)}°` : "—"}
             </Text>
           </View>
         )}
@@ -371,31 +372,33 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.text,
   },
   calendarBox: {
-    width: 22,
-    height: 22,
+    width: 24,
+    height: 24,
     borderWidth: 1.5,
     borderColor: COLORS.subtext,
-    borderRadius: 4,
-    paddingTop: 3,
-    paddingHorizontal: 2,
+    borderRadius: 6,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  calendarLine: {
-    height: 1.5,
-    width: "100%",
+  calendarTopBar: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 6,
     backgroundColor: COLORS.subtext,
-    marginBottom: 3,
   },
-  calendarDotsRow: {
+  calendarGridRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 2,
-    paddingHorizontal: 1,
+    marginVertical: 1.5,
   },
   calendarDot: {
-    width: 2.5,
-    height: 2.5,
-    borderRadius: 1.25,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
     backgroundColor: COLORS.subtext,
+    marginHorizontal: 2,
   },
   beakerWrap: {
     alignItems: "center",
@@ -501,6 +504,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 18,
     marginRight: 14,
+  },
+  recentCardEmpty: {
+    opacity: 0.4,
   },
   recentCardIcon: {
     width: 60,

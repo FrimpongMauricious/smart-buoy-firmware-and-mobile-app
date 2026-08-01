@@ -7,7 +7,9 @@ const BUOY_ID = "buoy-001";
 const BUOY_LOCATION = "KNUST Fish Pond";
 const FIRMWARE_VERSION = "1.0.0";
 const APP_VERSION = "1.0.0";
-const CREDITS = "Developed by Frimpong Mauricious — KNUST, Project 39";
+const PROJECT_NAME = "Smart Water-Quality Monitoring Buoy";
+const CREDITS = "Group 39 — Department of Computer Science, KNUST";
+const PROGRAM_LINE = "Embedded Systems Project — 2026";
 
 const COLORS = {
   background: "#0a0f1a",
@@ -92,7 +94,9 @@ export default function SettingsScreen({ onBack }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>About</Text>
           <Row label="App Version" value={APP_VERSION} />
-          <Row label="Credits" value={CREDITS} last />
+          <Row label="Project" value={PROJECT_NAME} />
+          <Row label="Credits" value={CREDITS} />
+          <Row label="Program" value={PROGRAM_LINE} last />
         </View>
       </ScrollView>
     </View>
