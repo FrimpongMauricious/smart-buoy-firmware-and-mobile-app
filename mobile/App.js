@@ -1,78 +1,109 @@
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
-import { ref, onValue } from "firebase/database";
+import { ref, query, limitToLast, onValue } from "firebase/database";
 import { database } from "./firebaseConfig";
 import DashboardScreen from "./screens/DashboardScreen";
 import AlertsScreen from "./screens/AlertsScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 
 const BUOY_ID = "buoy-001";
-const ONLINE_THRESHOLD_MS = 2 * 60 * 1000; // 2 minutes
 
 const COLORS = {
-  background: "#0a1628",
-  card: "#1a2940",
-  accent: "#3b82f6",
-  green: "#10b981",
+  background: "#0a0f1a",
+  navBackground: "#12192a",
+  active: "#06b6d4",
+  inactive: "#94a3b8",
   red: "#ef4444",
-  text: "#ffffff",
-  subtext: "#94a3b8",
 };
 
-const TABS = [
-  { key: "dashboard", label: "Dashboard" },
-  { key: "alerts", label: "Alerts" },
-  { key: "settings", label: "Settings" },
-];
+function HomeIcon({ color }) {
+  return (
+    <View style={styles.iconGroup}>
+      <View style={[styles.homeRoof, { borderBottomColor: color }]} />
+      <View style={[styles.homeBase, { borderColor: color }]} />
+    </View>
+  );
+}
+
+function HistoryIcon({ color }) {
+  return (
+    <View style={[styles.clockCircle, { borderColor: color }]}>
+      <View style={[styles.clockHandMinute, { backgroundColor: color }]} />
+      <View style={[styles.clockHandHour, { backgroundColor: color }]} />
+    </View>
+  );
+}
+
+function BellIcon({ color, hasAlerts }) {
+  return (
+    <View style={styles.iconGroup}>
+      <View style={[styles.bellBody, { borderColor: color }]} />
+      <View style={[styles.bellLip, { backgroundColor: color }]} />
+      {hasAlerts && <View style={styles.bellBadge} />}
+    </View>
+  );
+}
+
+function GearIcon({ color }) {
+  const teeth = [0, 45, 90, 135, 180, 225, 270, 315];
+  return (
+    <View style={styles.gearWrap}>
+      {teeth.map((angle) => (
+        <View
+          key={angle}
+          style={[
+            styles.gearTooth,
+            { backgroundColor: color, transform: [{ rotate: `${angle}deg` }, { translateY: -9 }] },
+          ]}
+        />
+      ))}
+      <View style={[styles.gearRing, { borderColor: color }]} />
+    </View>
+  );
+}
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState("dashboard");
-  const [lastSeen, setLastSeen] = useState(null);
-  const [now, setNow] = useState(Date.now());
+  const [hasAlerts, setHasAlerts] = useState(false);
 
   useEffect(() => {
-    const statusRef = ref(database, `buoys/${BUOY_ID}/status`);
-    const unsubscribe = onValue(statusRef, (snapshot) => {
+    const alertsRef = query(ref(database, `buoys/${BUOY_ID}/alerts`), limitToLast(5));
+    const unsubscribe = onValue(alertsRef, (snapshot) => {
       const data = snapshot.val();
-      setLastSeen(data?.last_seen ?? null);
+      setHasAlerts(!!data && Object.keys(data).length > 0);
     });
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => setNow(Date.now()), 5000);
-    return () => clearInterval(interval);
-  }, []);
+  const goToDashboard = () => setCurrentScreen("dashboard");
 
-  const isOnline = lastSeen != null && now - lastSeen < ONLINE_THRESHOLD_MS;
+  const tabs = [
+    { key: "dashboard", render: (color) => <HomeIcon color={color} /> },
+    { key: "history", render: (color) => <HistoryIcon color={color} /> },
+    { key: "alerts", render: (color) => <BellIcon color={color} hasAlerts={hasAlerts} /> },
+    { key: "settings", render: (color) => <GearIcon color={color} /> },
+  ];
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Smart Water Buoy</Text>
-        <View style={styles.statusIndicator}>
-          <View style={[styles.dot, { backgroundColor: isOnline ? COLORS.green : COLORS.red }]} />
-          <Text style={styles.statusLabel}>{isOnline ? "Online" : "Offline"}</Text>
-        </View>
+      <View style={styles.body}>
+        {(currentScreen === "dashboard" || currentScreen === "history") && <DashboardScreen />}
+        {currentScreen === "alerts" && <AlertsScreen onBack={goToDashboard} />}
+        {currentScreen === "settings" && <SettingsScreen onBack={goToDashboard} />}
       </View>
 
-      <View style={styles.screenContainer}>
-        {currentScreen === "dashboard" && <DashboardScreen />}
-        {currentScreen === "alerts" && <AlertsScreen />}
-        {currentScreen === "settings" && <SettingsScreen />}
-      </View>
-
-      <View style={styles.tabBar}>
-        {TABS.map((tab) => {
+      <View style={styles.navPill}>
+        {tabs.map((tab) => {
           const active = currentScreen === tab.key;
+          const color = active ? COLORS.active : COLORS.inactive;
           return (
             <TouchableOpacity
               key={tab.key}
-              style={styles.tabButton}
+              style={styles.navButton}
               onPress={() => setCurrentScreen(tab.key)}
             >
-              <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{tab.label}</Text>
+              {tab.render(color)}
             </TouchableOpacity>
           );
         })}
@@ -88,54 +119,115 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#1e2f4a",
-  },
-  headerTitle: {
-    color: COLORS.text,
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  statusIndicator: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 6,
-  },
-  statusLabel: {
-    color: COLORS.subtext,
-    fontSize: 13,
-  },
-  screenContainer: {
+  body: {
     flex: 1,
   },
-  tabBar: {
+  navPill: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: COLORS.navBackground,
     flexDirection: "row",
-    borderTopWidth: 1,
-    borderTopColor: "#1e2f4a",
-    backgroundColor: COLORS.card,
-  },
-  tabButton: {
-    flex: 1,
-    paddingVertical: 14,
     alignItems: "center",
+    justifyContent: "space-around",
+    shadowColor: "#000",
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 8,
   },
-  tabLabel: {
-    color: COLORS.subtext,
-    fontSize: 14,
-    fontWeight: "600",
+  navButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  tabLabelActive: {
-    color: COLORS.accent,
+  iconGroup: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  homeRoof: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 7,
+    borderRightWidth: 7,
+    borderBottomWidth: 7,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+  },
+  homeBase: {
+    width: 14,
+    height: 9,
+    borderWidth: 2,
+    borderTopWidth: 0,
+  },
+  clockCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+  },
+  clockHandMinute: {
+    position: "absolute",
+    width: 1.5,
+    height: 7,
+    top: 4,
+    left: 10,
+  },
+  clockHandHour: {
+    position: "absolute",
+    width: 6,
+    height: 1.5,
+    top: 10,
+    left: 11,
+  },
+  bellBody: {
+    width: 15,
+    height: 13,
+    borderWidth: 2,
+    borderBottomWidth: 0,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  bellLip: {
+    width: 19,
+    height: 2,
+    borderRadius: 1,
+    marginTop: 1,
+  },
+  bellBadge: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    width: 9,
+    height: 9,
+    borderRadius: 4.5,
+    backgroundColor: COLORS.red,
+    borderWidth: 1.5,
+    borderColor: COLORS.navBackground,
+  },
+  gearWrap: {
+    width: 22,
+    height: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  gearTooth: {
+    position: "absolute",
+    width: 3,
+    height: 5,
+    borderRadius: 1,
+  },
+  gearRing: {
+    position: "absolute",
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: 2,
+    backgroundColor: COLORS.navBackground,
   },
 });
