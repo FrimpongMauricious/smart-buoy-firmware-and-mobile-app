@@ -77,7 +77,7 @@ void loop() {
 
     if (now - lastSerialSend >= SERIAL_SEND_INTERVAL) {
         lastSerialSend = now;
-        // TODO Phase 4: send_readings_to_esp(g_ph, g_do, g_turb, g_temp, g_battV, g_battA);
+        send_readings_to_esp(g_ph, g_do, g_turb, g_temp, g_battV, g_battA);
     }
 
     int btn = check_buttons();
