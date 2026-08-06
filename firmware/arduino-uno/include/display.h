@@ -31,14 +31,18 @@ inline void display_render(int screen, float ph, float dox, float turb, float te
     switch (screen) {
         case 0:
             dtostrf(ph, 4, 2, buf1);
-            dtostrf(dox, 4, 2, buf2);
             lcd.setCursor(0, 0);
             lcd.print("pH: ");
             lcd.print(buf1);
             lcd.setCursor(0, 1);
-            lcd.print("DO: ");
-            lcd.print(buf2);
-            lcd.print(" mg/L");
+            if (dox < 0) {
+                lcd.print("DO: --");
+            } else {
+                dtostrf(dox, 4, 2, buf2);
+                lcd.print("DO: ");
+                lcd.print(buf2);
+                lcd.print(" mg/L");
+            }
             break;
 
         case 1:
@@ -56,8 +60,9 @@ inline void display_render(int screen, float ph, float dox, float turb, float te
 
         case 2:
         default: {
+            bool doAlert = (dox >= 0.0) && (dox < DO_MIN);
             bool alert = (ph < PH_MIN || ph > PH_MAX ||
-                          dox < DO_MIN ||
+                          doAlert ||
                           turb > TURB_MAX ||
                           temp < TEMP_MIN || temp > TEMP_MAX);
             lcd.setCursor(0, 0);

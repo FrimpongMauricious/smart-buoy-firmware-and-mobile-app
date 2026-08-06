@@ -191,12 +191,6 @@ export default function DashboardScreen({ onOpenAlerts, hasAlerts }) {
         </View>
         <View style={styles.iconStripItem}>
           <View style={styles.stripIconShadow}>
-            <Image source={require("../assets/images/oxygen_bubbles.png")} style={styles.stripIcon} />
-          </View>
-          <Text style={styles.iconStripLabel}>O₂  {dox != null ? `${dox.toFixed(2)} mg/L` : "--"}</Text>
-        </View>
-        <View style={styles.iconStripItem}>
-          <View style={styles.stripIconShadow}>
             <Image source={require("../assets/images/turbidity_droplet.png")} style={styles.stripIcon} />
           </View>
           <Text style={styles.iconStripLabel}>Turb  {turbidity != null ? turbidity.toFixed(1) : "--"}</Text>

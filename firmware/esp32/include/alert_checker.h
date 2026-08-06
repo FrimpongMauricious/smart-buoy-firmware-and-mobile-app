@@ -14,7 +14,7 @@ String check_thresholds(JsonDocument& reading) {
       alerts += "pH out of range: " + String(ph, 2) + "; ";
     }
   }
-  if (reading["do"].is<float>()) {
+  if (reading["do"].is<float>() && reading["do"].as<float>() >= 0.0) {
     float dox = reading["do"];
     if (dox < DO_MIN) {
       alerts += "DO low: " + String(dox, 2) + " mg/L; ";

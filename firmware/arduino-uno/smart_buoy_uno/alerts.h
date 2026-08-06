@@ -21,15 +21,18 @@ inline void alerts_init() {
 }
 
 inline AlertLevel check_alert_level(float ph, float dox, float turb, float temp) {
+    bool doDanger = (dox >= 0.0) && (dox < 3.0);
+    bool doWarning = (dox >= 0.0) && (dox < DO_MIN);
+
     if (ph < 6.0 || ph > 9.0 ||
-        dox < 3.0 ||
+        doDanger ||
         turb > 50.0 ||
         temp < 20.0 || temp > 35.0) {
         return ALERT_DANGER;
     }
 
     if (ph < PH_MIN || ph > PH_MAX ||
-        dox < DO_MIN ||
+        doWarning ||
         turb > TURB_MAX ||
         temp < TEMP_MIN || temp > TEMP_MAX) {
         return ALERT_WARNING;

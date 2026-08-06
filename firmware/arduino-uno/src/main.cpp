@@ -53,7 +53,11 @@ void loop() {
         Serial.print("pH=");
         Serial.print(g_ph, 2);
         Serial.print(" DO=");
-        Serial.print(g_do, 2);
+        if (g_do < 0) {
+            Serial.print("--");
+        } else {
+            Serial.print(g_do, 2);
+        }
         Serial.print(" Turb=");
         Serial.print(g_turb, 1);
         Serial.print(" Temp=");

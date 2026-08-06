@@ -27,9 +27,8 @@ inline float read_ph() {
 }
 
 inline float read_do() {
-    float voltage = analogRead(PIN_DO) * 5.0 / 1024.0;
-    float do_value = voltage * 10.0 / 3.3;
-    return constrain(do_value, 0.0, 20.0);
+    // DO sensor not installed in this build - return sentinel
+    return -1.0;
 }
 
 inline float read_turbidity() {
